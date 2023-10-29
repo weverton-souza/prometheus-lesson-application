@@ -1,0 +1,32 @@
+# First stage: build the application with Gradle
+FROM gradle:7-jdk-jammy AS builder
+
+# Copy the build.gradle, 'settings.gradle' files and the 'src' and 'config' folders to the temporary image
+WORKDIR /usr/src/prometheus-lesson-application
+COPY . .
+
+# Build the Spring Boot application without tests and generate the JAR file
+RUN gradle clean bootJar -x test
+
+
+# Second stage: create the final image
+FROM openjdk:21-ea-17-jdk AS server
+
+WORKDIR /usr/src/prometheus-lesson-application
+
+# Set the environment variables for MongoDB settings
+ENV MONGODB_USERNAME=prometheus-lesson-user
+ENV MONGODB_PASSWORD=PIh4Yrv75BLP1SuXY9XU
+ENV MONGODB_HOST=host.docker.internal
+ENV MONGODB_PORT=27017
+ENV MONGODB_DATABASE=prometheus-lesson-database
+
+# Expose the application port for external access
+EXPOSE 8081
+
+# Copy the JAR generated in the first stage to the final image
+COPY --from=builder "/usr/src/prometheus-lesson-application/build/libs/*.jar" "./prometheus-lesson-application.jar"
+
+# Start the application with the specified Java command
+# The '-Dspring.profiles.active=local' argument sets the active profile to 'local'
+CMD ["java", "-Dspring.profiles.active=docker", "-jar", "./prometheus-lesson-application.jar"]

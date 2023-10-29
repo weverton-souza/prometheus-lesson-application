@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: Prometheus Lesson Application
+    version: v0.1.0-beta.1
+  messages:
+    basename: messages
+    encoding: UTF-8
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    mongodb:
+      username: ${MONGODB_USERNAME:prometheus-lesson-user}
+      password: ${MONGODB_PASSWORD:PIh4Yrv75BLP1SuXY9XU}
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:prometheus-lesson-database}
+      uri: mongodb://${spring.data.mongodb.username}:${spring.data.mongodb.password}@${spring.data.mongodb.host}
+
+application:
+  lesson-core:
+    chat-gpt:
+      url: https://api.openai.com/v1/chat/completions
+      key: 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

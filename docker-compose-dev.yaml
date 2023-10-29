@@ -1,0 +1,36 @@
+version: "3.5"
+
+networks:
+  prometheus-lesson-network:
+    name: prometheus-lesson-network
+
+services:
+  mongodb-service:
+    container_name: mongodb-service
+    image: 'mongo:7.0.2-nanoserver-ltsc2022'
+    environment:
+      - 'MONGO_INITDB_DATABASE=prometheus-lesson-database'
+      - 'MONGO_INITDB_ROOT_PASSWORD=PIh4Yrv75BLP1SuXY9XU'
+      - 'MONGO_INITDB_ROOT_USERNAME=prometheus-lesson-user'
+    ports:
+      - '27017:27017'
+    networks:
+      prometheus-lesson-network:
+        aliases:
+          - prometheus-lesson-application.prometheuslesson
+    restart: unless-stopped
+    volumes:
+      - './data/mongodb:/data/db'
+
+  prometheus-lesson-application:
+    container_name: prometheus-lesson-application
+    depends_on:
+      - mongodb-service
+    image: 'wevertonsilvasouza/prometheus-lesson-application:latest'
+    networks:
+      prometheus-lesson-network:
+        aliases:
+          - prometheus-lesson-application.prometheuslesson
+    ports:
+      - '8081:8081'
+    restart: unless-stopped
